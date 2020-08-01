@@ -1,0 +1,10 @@
+name: AfkPlugin
+version: @version@
+main: xyz.n7mn.dev.afkplugin.AfkPlugin
+authors: [n3m_]
+description: AfkPlugin
+website: https://n7mn.xyz/
+commands:
+  afk:
+    description: 'Afk Command'
+    usage: '/afk'
