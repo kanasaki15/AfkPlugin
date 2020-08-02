@@ -23,11 +23,14 @@ class AfkEventListener implements Listener {
 
     @EventHandler
     public void PlayerTeleportEvent (PlayerTeleportEvent e){
-        System.out.println(e.getPlayer().getName());
-        System.out.println(e.getCause());
+        System.out.println("Player : " + e.getPlayer().getName());
+        System.out.println("Cause : " + e.getCause());
 
         if (afk.isAfk(e.getPlayer())){
-            e.setCancelled(true);
+            if (e.getFrom().getBlockX() != e.getTo().getBlockX() || e.getFrom().getBlockY() != e.getTo().getBlockY() || e.getFrom().getBlockZ() != e.getTo().getBlockZ()){
+                e.getPlayer().sendMessage(ChatColor.YELLOW + afk.GetMessage("afkMove"));
+                e.setCancelled(true);
+            }
         }
     }
 

@@ -50,5 +50,7 @@ public final class AfkPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+        new AfkFunction().fileWrite("./" + getDataFolder().getPath() + "/AfkData.json","[]");
+        getLogger().info("AfkPlugin Ver " + Bukkit.getPluginManager().getPlugin("AfkPlugin").getDescription().getVersion() + "Stoped!!");
     }
 }
