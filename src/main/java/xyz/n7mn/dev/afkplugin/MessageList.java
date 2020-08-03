@@ -13,6 +13,7 @@ class MessageList {
     private String ConsoleUserAfkOnToTarget;
     private String ConsoleUserAfkOffToTarget;
     private String afkAutoOn;
+    private String tpTarget;
 
     public String getAfkOn() {
         return afkOn;
@@ -60,5 +61,9 @@ class MessageList {
 
     public String getAfkAutoOn() {
         return afkAutoOn;
+    }
+
+    public String getTpTarget() {
+        return tpTarget;
     }
 }

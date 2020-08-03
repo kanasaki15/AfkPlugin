@@ -174,6 +174,8 @@ public class AfkFunction {
         if (msg.equals("ConsoleUserAfkOnToTarget")){ return list.getConsoleUserAfkOnToTarget(); }
         if (msg.equals("ConsoleUserAfkOffToTarget")){ return list.getConsoleUserAfkOffToTarget(); }
         if (msg.equals("afkAutoOn")){ return list.getAfkAutoOn(); }
+        if (msg.equals("tpTarget")){ return list.getTpTarget(); }
+
 
         return "";
     }

@@ -33,7 +33,8 @@ public final class AfkPlugin extends JavaPlugin {
                     "  \"UserAfkOffToTarget\": \"[user]さんから退席状態を解除されました。\",\n" +
                     "  \"ConsoleUserAfkOnToTarget\": \"管理者から退席状態に指定されました。 解除するには/afkを実行してください。\",\n" +
                     "  \"ConsoleUserAfkOffToTarget\": \"管理者から退席状態を解除されました。\",\n" +
-                    "  \"afkAutoOn\": \"[min]分[sec]秒放置されているのを検知したため退席状態になりました。 \"\n" +
+                    "  \"afkAutoOn\": \"[min]分[sec]秒放置されているのを検知したため退席状態になりました。 \",\n" +
+                    "  \"tpTarget\": \"[user]さんは現在退席中のため、テレポートをキャンセルしました。\"\n" +
                     "}";
             new AfkFunction().fileWrite(defaultPass, json);
         }
