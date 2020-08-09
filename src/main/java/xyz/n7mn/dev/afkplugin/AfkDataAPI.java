@@ -8,6 +8,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.io.*;
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -37,18 +38,19 @@ class AfkDataAPI {
                     con.prepareStatement("CREATE TABLE `AfkUserTable` (\n" +
                             "  `UUID` varchar(36) COLLATE utf8mb4_ja_0900_as_cs_ks NOT NULL,\n" +
                             "  `AfkFlag` tinyint(1) NOT NULL,\n" +
-                            "  `Date` datetime NOT NULL\n" +
-                            ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_ja_0900_as_cs_ks;\n").execute();
+                            "  `LastMoveDate` datetime NOT NULL\n" +
+                            ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_ja_0900_as_cs_ks;").execute();
+                    con.prepareStatement("ALTER TABLE `AfkUserTable` ADD PRIMARY KEY (`UUID`);").execute();
                 }
-                ResultSet resultSet = con.prepareStatement("SELECT * FROM `AfkUserTable`;").executeQuery();
 
+                ResultSet resultSet = con.prepareStatement("SELECT * FROM `AfkUserTable`;").executeQuery();
                 boolean isNext = resultSet.next();
                 if (isNext){
                     while (isNext){
                         AfkResult afk = new AfkResult();
                         afk.setUuid(UUID.fromString(resultSet.getString("UUID")));
                         afk.setAfkFlag(resultSet.getBoolean("AfkFlag"));
-                        afk.setDate(resultSet.getDate("Date"));
+                        afk.setDate(new Date(resultSet.getTimestamp("LastMoveDate").getTime()));
                         list.add(afk);
                         isNext = resultSet.next();
                     }
@@ -84,7 +86,7 @@ class AfkDataAPI {
                     AfkResult afk = new AfkResult();
                     afk.setUuid(UUID.fromString(set.getString("UUID")));
                     afk.setAfkFlag(set.getBoolean("AfkFlag"));
-                    afk.setDate(set.getDate("Date"));
+                    afk.setDate(new Date(set.getTimestamp("LastMoveDate").getTime()));
 
                     return afk;
                 }
@@ -118,7 +120,7 @@ class AfkDataAPI {
             Connection con = null;
             try {
                 con = DriverManager.getConnection("jdbc:mysql://" + MySQLServer + "/" + MySQLDatabase + MySQLOption, MySQLUsername, MySQLPassword);
-                PreparedStatement statement = con.prepareStatement("INSERT INTO `AfkUserTable`(`UUID`, `AfkFlag`, `Date`) VALUES (?,?,NOW())");
+                PreparedStatement statement = con.prepareStatement("INSERT INTO `AfkUserTable`(`UUID`, `AfkFlag`, `LastMoveDate`) VALUES (?,?,NOW())");
                 statement.setString(1, uuid.toString());
                 statement.setBoolean(2, AfkFlag);
                 return statement.execute();
@@ -152,7 +154,7 @@ class AfkDataAPI {
             Connection con = null;
             try {
                 con = DriverManager.getConnection("jdbc:mysql://" + MySQLServer + "/" + MySQLDatabase + MySQLOption, MySQLUsername, MySQLPassword);
-                PreparedStatement statement = con.prepareStatement("UPDATE `AfkUserTable` SET `UUID` = ?,`AfkFlag` = ?,`Date` = NOW() WHERE UUID = ?");
+                PreparedStatement statement = con.prepareStatement("UPDATE `AfkUserTable` SET `UUID` = ?,`AfkFlag` = ?,`LastMoveDate` = NOW() WHERE UUID = ?");
                 statement.setString(1, uuid.toString());
                 statement.setBoolean(2, AfkFlag);
                 statement.setString(3, uuid.toString());
