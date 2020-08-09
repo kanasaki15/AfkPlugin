@@ -1,33 +1,16 @@
 package xyz.n7mn.dev.afkplugin;
 
-import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import xyz.n7mn.dev.bstats.bukkit.Metrics;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.Callable;
 
 public final class AfkPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
         // Plugin startup logic
-
-        Metrics metrics = new Metrics(this, 8475);
-        metrics.addCustomChart(new Metrics.DrilldownPie(
-                "minecraft_server_version", new Callable<Map<String, Map<String, Integer>>>() {
-            public Map<String, Map<String, Integer>> call() throws Exception {
-                Map<String, Map<String, Integer>> map = new HashMap<>();
-                Map<String, Integer> sub = new HashMap<>();
-                sub.put(Bukkit.getVersion(), 1);
-                map.put(Bukkit.getName(), sub);
-                return map;
-            }
-        }));
-
-
         saveDefaultConfig();
         getCommand("afk").setExecutor(new AfkCommand());
         getServer().getPluginManager().registerEvents(new AfkEventListener(),this);
@@ -63,6 +46,7 @@ public final class AfkPlugin extends JavaPlugin {
 
         new AfkTimer().runTaskLater(this, 20);
 
+        Metrics metrics = new Metrics(this, 8475);
         getLogger().info("AfkPlugin Ver " + Bukkit.getPluginManager().getPlugin("AfkPlugin").getDescription().getVersion() + " Started!");
     }
 
