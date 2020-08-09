@@ -29,7 +29,12 @@ public class AfkFunction {
 
     public boolean isAfk(UUID uuid){
 
-        return new AfkDataAPI().getUserResult(uuid).isAfkFlag();
+        AfkResult result = new AfkDataAPI().getUserResult(uuid);
+        if (result == null){
+            return false;
+        }
+
+        return result.isAfkFlag();
     }
 
     @Deprecated
