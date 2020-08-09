@@ -19,6 +19,7 @@ public final class AfkPlugin extends JavaPlugin {
         String defaultPass = "./" + getDataFolder().getPath() + "/lang_ja.json";
         if (System.getProperty("os.name").toLowerCase().startsWith("windows")){
             pass = pass.replaceAll("/", "\\\\");
+            defaultPass = defaultPass.replaceAll("/", "\\\\");
         }
 
         if (!new File(defaultPass).exists()){
@@ -53,7 +54,8 @@ public final class AfkPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
-        new AfkFunction().fileWrite("./" + getDataFolder().getPath() + "/AfkData.json","[]");
-        getLogger().info("AfkPlugin Ver " + Bukkit.getPluginManager().getPlugin("AfkPlugin").getDescription().getVersion() + "Stoped!!");
+        // new AfkFunction().fileWrite("./" + getDataFolder().getPath() + "/AfkData.json","[]");
+        new AfkFunction().DeleteAllUser();
+        getLogger().info("AfkPlugin Ver " + Bukkit.getPluginManager().getPlugin("AfkPlugin").getDescription().getVersion() + " Stoped!!");
     }
 }

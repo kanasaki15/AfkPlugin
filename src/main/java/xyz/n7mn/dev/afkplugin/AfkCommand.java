@@ -15,23 +15,25 @@ class AfkCommand implements CommandExecutor {
 
         if (sender instanceof Player){
 
+            Player player = (Player)sender;
+
             if (args.length == 0){
                 //sender.sendMessage(isAfk((Player) sender) + " -> " + (!isAfk((Player) sender)));
-                AfkCommandEvent event = new AfkCommandEvent(false, (Player) sender);
+                AfkCommandEvent event = new AfkCommandEvent(false, player);
                 Bukkit.getServer().getPluginManager().callEvent(event);
 
                 if (event.isCancelled()){
                     return true;
                 }
 
-                afk.SetAfk((Player) sender);
-                if (afk.isAfk((Player) sender)){
+                afk.SetAfk(player.getUniqueId());
+                if (afk.isAfk(player.getUniqueId())){
                     sender.sendMessage(ChatColor.GREEN + afk.GetMessage("afkOn"));
                 } else {
                     sender.sendMessage(ChatColor.GREEN + afk.GetMessage("afkOff"));
                 }
             } else {
-                if (!((Player) sender).isOp()){
+                if (!player.isOp()){
                     sender.sendMessage(ChatColor.RED + afk.GetMessage("afkPermError"));
                     return true;
                 }
@@ -43,13 +45,13 @@ class AfkCommand implements CommandExecutor {
                 }
 
                 for (int i = 0; i < args.length; i++){
-                    Player player = Bukkit.getServer().getPlayer(args[i]);
+                    player = Bukkit.getServer().getPlayer(args[i]);
                     if (player == null){
                         sender.sendMessage(ChatColor.RED + afk.GetMessage("UserOffline"));
                         return true;
                     } else {
-                        afk.SetAfk(player);
-                        if (afk.isAfk(player)){
+                        afk.SetAfk(player.getUniqueId());
+                        if (afk.isAfk(player.getUniqueId())){
                             sender.sendMessage(ChatColor.GREEN + afk.GetMessage("UserAfkOn").replaceAll("\\[user\\]", player.getName()));
                             player.sendMessage(ChatColor.GOLD + afk.GetMessage("UserAfkOnToTarget").replaceAll("\\[user\\]", ((Player) sender).getName()));
                         } else {
@@ -75,8 +77,8 @@ class AfkCommand implements CommandExecutor {
                     sender.sendMessage(ChatColor.RED + afk.GetMessage("UserOffline"));
                     return true;
                 }
-                afk.SetAfk(player);
-                if (afk.isAfk(player)){
+                afk.SetAfk(player.getUniqueId());
+                if (afk.isAfk(player.getUniqueId())){
                     sender.sendMessage(ChatColor.GREEN + afk.GetMessage("UserAfkOn").replaceAll("\\[user\\]", player.getName()));
                     player.sendMessage(ChatColor.GOLD + afk.GetMessage("ConsoleUserAfkOnToTarget"));
                 } else {

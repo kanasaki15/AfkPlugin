@@ -7,4 +7,4 @@ MySQLServer: '' # MySQL Server (MySQL5.6+)
 MySQLUsername: '' # Username
 MySQLPassword: '' # Password
 MySQLDatabase: '' # Database
-MySQLOption: '' # ConnectOption (If you are not sure, do not change it.)
+MySQLOption: '?allowPublicKeyRetrieval=true&useSSL=false' # ConnectOption (If you are not sure, do not change it.)

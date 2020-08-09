@@ -1,8 +1,6 @@
 package xyz.n7mn.dev.afkplugin;
 
-import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -13,18 +11,35 @@ import java.util.*;
 public class AfkFunction {
 
     private final Plugin plugin = Bukkit.getPluginManager().getPlugin("AfkPlugin");
-    private final String pass = "./" + plugin.getDataFolder().getPath() + "/AfkData.json";
 
+    public List<AfkResult> GetAfkDataList() {
+        List<AfkResult> list = new AfkDataAPI().getAllList();
+        return list;
+    }
+
+    public AfkResult GetAfkDataByUser(UUID uuid){
+        return new AfkDataAPI().getUserResult(uuid);
+    }
+
+    @Deprecated
+    public boolean isAfk(Player player){
+
+        return isAfk(player.getUniqueId());
+    }
+
+    public boolean isAfk(UUID uuid){
+
+        return new AfkDataAPI().getUserResult(uuid).isAfkFlag();
+    }
+
+    @Deprecated
     public void SetAfk(Player player){
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
         List<AfkResult> list = GetAfkDataList();
         boolean writeFlag = false;
         for (int i = 0; i < list.size(); i++){
             if (list.get(i).getUuid().equals(player.getUniqueId())){
-                list.get(i).setDate(new Date());
-                list.get(i).setAfkFlag(!list.get(i).isAfkFlag());
-                if (new AfkData().updateList(list)){
+                if (new AfkDataAPI().updateList(player.getUniqueId(), !list.get(i).isAfkFlag())){
                     writeFlag = true;
                     break;
                 }
@@ -32,55 +47,31 @@ public class AfkFunction {
         }
 
         if (!writeFlag){
-            AfkResult a = new AfkResult();
-            a.setAfkFlag(true);
-            a.setUuid(player.getUniqueId());
-            a.setDate(new Date());
-            list.add(a);
-            new AfkData().updateList(list);
+            new AfkDataAPI().addList(player.getUniqueId(), true);
         }
     }
 
-    public boolean isAfk(Player player){
-
-        List<AfkResult> list = GetAfkDataList();
-
-        for (int i = 0; i < list.size(); i++){
-            if (list.get(i).getUuid().equals(player.getUniqueId())){
-                return list.get(i).isAfkFlag();
-            }
-        }
-
-        return false;
+    public boolean SetAfk(UUID uuid){
+        AfkDataAPI afkAPI = new AfkDataAPI();
+        return afkAPI.updateList(uuid, !isAfk(uuid));
     }
 
-
-    public List<AfkResult> GetAfkDataList() {
-        List<AfkResult> list = new AfkData().getAllList();
-
-        if (list == null){
-            return new ArrayList<>();
-        }
-
-        if (list != null && list.size() == 0){
-            return new ArrayList<>();
-        }
-
-        return list;
+    public boolean SetAfk(UUID uuid, boolean AfkFlag){
+        return new AfkDataAPI().updateList(uuid, AfkFlag);
     }
 
-    public boolean UpdateDataList(UUID uuid,AfkResult data){
-        List<AfkResult> list = GetAfkDataList();
-        for (int i = 0; i < list.size(); i++){
-            if (list.get(i).getUuid().equals(uuid)){
-                list.get(i).setUuid(data.getUuid());
-                list.get(i).setDate(new Date());
-                list.get(i).setAfkFlag(data.isAfkFlag());
+    public void SetInitAfkByUser(UUID uuid){
+        new AfkDataAPI().addList(uuid, false);
+    }
 
-                return true;
-            }
-        }
-        return false;
+    public boolean DeleteUser(UUID uuid){
+
+        return new AfkDataAPI().deleteListByUser(uuid);
+    }
+
+    public boolean DeleteAllUser(){
+
+        return new AfkDataAPI().deleteListByAll();
     }
 
     public String GetMessage(String msg){
