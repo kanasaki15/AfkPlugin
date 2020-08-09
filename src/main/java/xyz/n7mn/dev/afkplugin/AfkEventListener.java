@@ -48,12 +48,24 @@ class AfkEventListener implements Listener {
 
     @EventHandler
     public void PlayerMoveEvent (PlayerMoveEvent e){
+        int autoTime = plugin.getConfig().getInt("AfkAutoTime");
+        int min = autoTime / 60;
+        int sec = autoTime - (60 * min);
         if (afk.isAfk(e.getPlayer().getUniqueId())){
             if (e.getFrom().getBlockX() != e.getTo().getBlockX() || e.getFrom().getBlockY() != e.getTo().getBlockY() || e.getFrom().getBlockZ() != e.getTo().getBlockZ()){
                 e.getPlayer().sendMessage(ChatColor.YELLOW + afk.GetMessage("afkMove"));
                 e.setCancelled(true);
             }
         } else {
+
+            int nowTime  = (int) (new Date().getTime() / 1000L);
+            int lastTime = (int) (afk.GetAfkDataByUser(e.getPlayer().getUniqueId()).getDate().getTime() / 1000L);
+
+            if (nowTime - lastTime >= autoTime && lastTime > 0){
+                afk.SetAfk(e.getPlayer().getUniqueId());
+                e.getPlayer().sendMessage(ChatColor.GREEN + afk.GetMessage("afkAutoOn").replaceAll("\\[min\\]",""+min).replaceAll("\\[sec\\]",""+sec));
+                e.setCancelled(true);
+            }
             afk.SetAfk(e.getPlayer().getUniqueId(), false);
         }
     }
