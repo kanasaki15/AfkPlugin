@@ -15,32 +15,27 @@ class AfkTimer extends BukkitRunnable {
     @Override
     public void run() {
 
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable() {
-            @Override
-            public void run() {
-                plugin.reloadConfig();
-                int autoTime = plugin.getConfig().getInt("AfkAutoTime");
-                int min = autoTime / 60;
-                int sec = autoTime - (60 * min);
-                // System.out.println(autoTime);
+        plugin.reloadConfig();
+        int autoTime = plugin.getConfig().getInt("AfkAutoTime");
+        int min = autoTime / 60;
+        int sec = autoTime - (60 * min);
+        // System.out.println(autoTime);
 
-                List<AfkResult> list = afk.GetAfkDataList();
+        List<AfkResult> list = afk.GetAfkDataList();
 
-                for (int i = 0; i < list.size(); i++){
-                    int nowTime = (int)(new Date().getTime() / 1000L);
-                    int time = (int)(list.get(i).getDate().getTime() / 1000L);
+        for (int i = 0; i < list.size(); i++){
+            int nowTime = (int)(new Date().getTime() / 1000L);
+            int time = (int)(list.get(i).getDate().getTime() / 1000L);
 
-                    if (list.get(i).isAfkFlag()){
-                        continue;
-                    }
-
-                    if (nowTime - time >= autoTime && time > 0){
-                        afk.SetAfk(list.get(i).getUuid());
-                        Bukkit.getServer().getPlayer(list.get(i).getUuid()).sendMessage(ChatColor.GREEN + afk.GetMessage("afkAutoOn").replaceAll("\\[min\\]",""+min).replaceAll("\\[sec\\]",""+sec));
-                    }
-                }
+            if (list.get(i).isAfkFlag()){
+                continue;
             }
-        });
+
+            if (nowTime - time >= autoTime && time > 0){
+                afk.SetAfk(list.get(i).getUuid());
+                Bukkit.getServer().getPlayer(list.get(i).getUuid()).sendMessage(ChatColor.GREEN + afk.GetMessage("afkAutoOn").replaceAll("\\[min\\]",""+min).replaceAll("\\[sec\\]",""+sec));
+            }
+        }
 
         new AfkTimer().runTaskLater(plugin, 20);
     }
