@@ -18,7 +18,7 @@ class AfkDataAPI {
     private final Plugin plugin = Bukkit.getPluginManager().getPlugin("AfkPlugin");
     private final String pass = "./" + plugin.getDataFolder().getPath() + "/AfkData.json";
 
-    private List<AfkResult> list = new ArrayList<>();
+    private List<AfkResult> list;
     private boolean isMySQL = plugin.getConfig().getBoolean("UseMySQL");
 
     private final String MySQLServer   = plugin.getConfig().getString("MySQLServer");

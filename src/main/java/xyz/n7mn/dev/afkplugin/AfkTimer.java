@@ -28,6 +28,10 @@ class AfkTimer extends BukkitRunnable {
             int nowTime = (int)(new Date().getTime() / 1000L);
             int time = (int)(list.get(i).getDate().getTime() / 1000L);
 
+            if (afk.GetAfkDataByUser(list.get(i).getUuid()) == null){
+                continue;
+            }
+
             if (nowTime - time >= autoTime && time > 0 && !afk.GetAfkDataByUser(list.get(i).getUuid()).isAfkFlag()){
                 afk.SetAfk(list.get(i).getUuid());
                 Bukkit.getServer().getPlayer(list.get(i).getUuid()).sendMessage(ChatColor.GREEN + afk.GetMessage("afkAutoOn").replaceAll("\\[min\\]",""+min).replaceAll("\\[sec\\]",""+sec));
