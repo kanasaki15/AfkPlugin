@@ -40,7 +40,7 @@ class AfkDataAPI {
                             "  `Date` datetime NOT NULL\n" +
                             ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_ja_0900_as_cs_ks;\n").execute();
                 }
-                ResultSet resultSet = con.prepareStatement("SELECT * FROM AfkUserTable;").executeQuery();
+                ResultSet resultSet = con.prepareStatement("SELECT * FROM `AfkUserTable`;").executeQuery();
 
                 boolean isNext = resultSet.next();
                 if (isNext){
@@ -77,7 +77,7 @@ class AfkDataAPI {
             Connection con = null;
             try {
                 con = DriverManager.getConnection("jdbc:mysql://" + MySQLServer + "/" + MySQLDatabase + MySQLOption, MySQLUsername, MySQLPassword);
-                PreparedStatement statement = con.prepareStatement("SELECT * FROM WHERE UUID = ?");
+                PreparedStatement statement = con.prepareStatement("SELECT * FROM `AfkUserTable` WHERE UUID = ?");
                 statement.setString(1, uuid.toString());
                 ResultSet set = statement.executeQuery();
                 if (set.next()){
