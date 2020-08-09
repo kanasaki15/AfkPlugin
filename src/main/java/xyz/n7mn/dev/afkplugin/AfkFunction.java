@@ -24,7 +24,7 @@ public class AfkFunction {
             if (list.get(i).getUuid().equals(player.getUniqueId())){
                 list.get(i).setDate(new Date());
                 list.get(i).setAfkFlag(!list.get(i).isAfkFlag());
-                if (fileWrite(pass,gson.toJson(list))){
+                if (new AfkData().updateList(list)){
                     writeFlag = true;
                     break;
                 }
@@ -37,7 +37,7 @@ public class AfkFunction {
             a.setUuid(player.getUniqueId());
             a.setDate(new Date());
             list.add(a);
-            fileWrite(pass,gson.toJson(list));
+            new AfkData().updateList(list);
         }
     }
 
@@ -56,7 +56,7 @@ public class AfkFunction {
 
 
     public List<AfkResult> GetAfkDataList() {
-        List<AfkResult> list = new Gson().fromJson(fileRead(pass), new TypeToken<Collection<AfkResult>>(){}.getType());
+        List<AfkResult> list = new AfkData().getAllList();
 
         if (list == null){
             return new ArrayList<>();
@@ -83,8 +83,36 @@ public class AfkFunction {
         return false;
     }
 
+    public String GetMessage(String msg){
+        String pass = "./" + plugin.getDataFolder().getPath() + "/lang_" + plugin.getConfig().getString("Lang") + ".json";
 
-    public String fileRead(String pass){
+        String s = fileRead(pass);
+        if (s.equals("[]")){
+            new File(pass).delete();
+            pass = "./" + plugin.getDataFolder().getPath() + "/lang_ja.json";
+        }
+
+        MessageList list = new Gson().fromJson(fileRead(pass), MessageList.class);
+
+        if (msg.equals("afkOn")){ return list.getAfkOn(); }
+        if (msg.equals("afkOff")){ return list.getAfkOff(); }
+        if (msg.equals("afkMove")){ return list.getAfkMove(); }
+        if (msg.equals("afkPermError")){ return list.getAfkPermError(); }
+        if (msg.equals("UserOffline")){ return list.getUserOffline(); }
+        if (msg.equals("UserAfkOn")){ return list.getUserAfkOn(); }
+        if (msg.equals("UserAfkOnToTarget")){ return list.getUserAfkOnToTarget(); }
+        if (msg.equals("UserAfkOff")){ return list.getUserAfkOff(); }
+        if (msg.equals("UserAfkOffToTarget")){ return list.getUserAfkOffToTarget(); }
+        if (msg.equals("ConsoleUserAfkOnToTarget")){ return list.getConsoleUserAfkOnToTarget(); }
+        if (msg.equals("ConsoleUserAfkOffToTarget")){ return list.getConsoleUserAfkOffToTarget(); }
+        if (msg.equals("afkAutoOn")){ return list.getAfkAutoOn(); }
+        if (msg.equals("tpTarget")){ return list.getTpTarget(); }
+
+
+        return "";
+    }
+
+    String fileRead(String pass){
 
         if (System.getProperty("os.name").toLowerCase().startsWith("windows")){
             pass = pass.replaceAll("/", "\\\\");
@@ -127,7 +155,7 @@ public class AfkFunction {
         }
     }
 
-    public boolean fileWrite(String pass, String content){
+    boolean fileWrite(String pass, String content){
         if (System.getProperty("os.name").toLowerCase().startsWith("windows")){
             pass = pass.replaceAll("/", "\\\\");
         }
@@ -149,35 +177,6 @@ public class AfkFunction {
                 p_writer.close();
             }
         }
-    }
-
-    public String GetMessage(String msg){
-        String pass = "./" + plugin.getDataFolder().getPath() + "/lang_" + plugin.getConfig().getString("Lang") + ".json";
-
-        String s = fileRead(pass);
-        if (s.equals("[]")){
-            new File(pass).delete();
-            pass = "./" + plugin.getDataFolder().getPath() + "/lang_ja.json";
-        }
-
-        MessageList list = new Gson().fromJson(fileRead(pass), MessageList.class);
-
-        if (msg.equals("afkOn")){ return list.getAfkOn(); }
-        if (msg.equals("afkOff")){ return list.getAfkOff(); }
-        if (msg.equals("afkMove")){ return list.getAfkMove(); }
-        if (msg.equals("afkPermError")){ return list.getAfkPermError(); }
-        if (msg.equals("UserOffline")){ return list.getUserOffline(); }
-        if (msg.equals("UserAfkOn")){ return list.getUserAfkOn(); }
-        if (msg.equals("UserAfkOnToTarget")){ return list.getUserAfkOnToTarget(); }
-        if (msg.equals("UserAfkOff")){ return list.getUserAfkOff(); }
-        if (msg.equals("UserAfkOffToTarget")){ return list.getUserAfkOffToTarget(); }
-        if (msg.equals("ConsoleUserAfkOnToTarget")){ return list.getConsoleUserAfkOnToTarget(); }
-        if (msg.equals("ConsoleUserAfkOffToTarget")){ return list.getConsoleUserAfkOffToTarget(); }
-        if (msg.equals("afkAutoOn")){ return list.getAfkAutoOn(); }
-        if (msg.equals("tpTarget")){ return list.getTpTarget(); }
-
-
-        return "";
     }
 }
 
