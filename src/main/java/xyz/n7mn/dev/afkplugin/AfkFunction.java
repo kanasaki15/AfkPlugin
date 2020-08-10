@@ -11,9 +11,10 @@ import java.util.*;
 public class AfkFunction {
 
     private final Plugin plugin = Bukkit.getPluginManager().getPlugin("AfkPlugin");
+    private AfkDataAPI AfkAPI = new AfkDataAPI();
 
     public List<AfkResult> GetAfkDataList() {
-        List<AfkResult> list = new AfkDataAPI().getAllList();
+        List<AfkResult> list = AfkAPI.getAllList();
         return list;
     }
 
@@ -29,7 +30,7 @@ public class AfkFunction {
 
     public boolean isAfk(UUID uuid){
 
-        AfkResult result = new AfkDataAPI().getUserResult(uuid);
+        AfkResult result = AfkAPI.getUserResult(uuid);
         if (result == null){
             return false;
         }
@@ -44,7 +45,7 @@ public class AfkFunction {
         boolean writeFlag = false;
         for (int i = 0; i < list.size(); i++){
             if (list.get(i).getUuid().equals(player.getUniqueId())){
-                if (new AfkDataAPI().updateList(player.getUniqueId(), !list.get(i).isAfkFlag())){
+                if (AfkAPI.updateList(player.getUniqueId(), !list.get(i).isAfkFlag())){
                     writeFlag = true;
                     break;
                 }
@@ -57,26 +58,29 @@ public class AfkFunction {
     }
 
     public boolean SetAfk(UUID uuid){
-        AfkDataAPI afkAPI = new AfkDataAPI();
-        return afkAPI.updateList(uuid, !isAfk(uuid));
+        return AfkAPI.updateList(uuid, !isAfk(uuid));
     }
 
     public boolean SetAfk(UUID uuid, boolean AfkFlag){
-        return new AfkDataAPI().updateList(uuid, AfkFlag);
+        return AfkAPI.updateList(uuid, AfkFlag);
     }
 
     public void SetInitAfkByUser(UUID uuid){
-        new AfkDataAPI().addList(uuid, false);
+        AfkAPI.addList(uuid, false);
     }
 
     public boolean DeleteUser(UUID uuid){
 
-        return new AfkDataAPI().deleteListByUser(uuid);
+        return AfkAPI.deleteListByUser(uuid);
     }
 
     public boolean DeleteAllUser(){
 
-        return new AfkDataAPI().deleteListByAll();
+        return AfkAPI.deleteListByAll();
+    }
+
+    public void Close(){
+        AfkAPI.SQLConnectClose();
     }
 
     public String GetMessage(String msg){

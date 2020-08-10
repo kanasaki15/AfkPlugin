@@ -8,7 +8,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 class AfkCommand implements CommandExecutor {
-    AfkFunction afk = new AfkFunction();
+
+    AfkFunction afk;
+
+    public AfkCommand(AfkFunction afk){
+        this.afk = afk;
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {

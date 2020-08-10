@@ -15,10 +15,14 @@ import java.util.List;
 
 class AfkEventListener implements Listener {
 
-    private final AfkFunction afk = new AfkFunction();
+    private AfkFunction afk;
     private final Plugin plugin = Bukkit.getPluginManager().getPlugin("AfkPlugin");
     private Player tpCommandExePlayer = null;
     private List<TimerTask> taskList = new ArrayList<>();
+
+    public AfkEventListener(AfkFunction afk) {
+        this.afk = afk;
+    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void PlayerCommandPreprocessEvent (PlayerCommandPreprocessEvent e){
@@ -64,7 +68,7 @@ class AfkEventListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void PlayerJoinEvent (PlayerJoinEvent e){
         new AfkFunction().SetInitAfkByUser(e.getPlayer().getUniqueId());
-        taskList.add(new TimerTask(e.getPlayer(), new AfkTimer(e.getPlayer()).runTaskLater(plugin, 20L)));
+        taskList.add(new TimerTask(e.getPlayer(), new AfkTimer(e.getPlayer(), afk).runTaskLater(plugin, 20L)));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

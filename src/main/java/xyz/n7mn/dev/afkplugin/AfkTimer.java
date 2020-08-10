@@ -11,14 +11,15 @@ import java.util.Date;
 
 class AfkTimer extends BukkitRunnable {
     private final Plugin plugin = Bukkit.getPluginManager().getPlugin("AfkPlugin");
-    private final AfkFunction AfkAPI = new AfkFunction();
+    private final AfkFunction AfkAPI;
 
     private boolean isCancel = false;
 
     Player player;
 
-    public AfkTimer(Player player){
+    public AfkTimer(Player player, AfkFunction afk){
         this.player = player;
+        this.AfkAPI = afk;
     }
 
     @Override
@@ -42,7 +43,7 @@ class AfkTimer extends BukkitRunnable {
                 }
             }
 
-            new AfkTimer(player).runTaskLater(plugin, 20L);
+            new AfkTimer(player,AfkAPI).runTaskLater(plugin, 20L);
         }
     }
 

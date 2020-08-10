@@ -2,19 +2,20 @@ package xyz.n7mn.dev.afkplugin;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitTask;
 import xyz.n7mn.dev.bstats.bukkit.Metrics;
 
 import java.io.File;
 
 public final class AfkPlugin extends JavaPlugin {
 
+    private final AfkFunction afk = new AfkFunction();
+
     @Override
     public void onEnable() {
         // Plugin startup logic
         saveDefaultConfig();
-        getCommand("afk").setExecutor(new AfkCommand());
-        getServer().getPluginManager().registerEvents(new AfkEventListener(),this);
+        getCommand("afk").setExecutor(new AfkCommand(afk));
+        getServer().getPluginManager().registerEvents(new AfkEventListener(afk),this);
 
         String pass = "./" + getDataFolder().getPath() + "/lang_"+getConfig().getString("Lang")+".json";
         String defaultPass = "./" + getDataFolder().getPath() + "/lang_ja.json";
@@ -55,7 +56,9 @@ public final class AfkPlugin extends JavaPlugin {
         // Plugin shutdown logic
         // new AfkFunction().fileWrite("./" + getDataFolder().getPath() + "/AfkData.json","[]");
 
-        new AfkFunction().DeleteAllUser();
+        afk.DeleteAllUser();
+        afk.Close();
+
         getLogger().info("AfkPlugin Ver " + Bukkit.getPluginManager().getPlugin("AfkPlugin").getDescription().getVersion() + " Stoped!!");
     }
 }

@@ -26,9 +26,10 @@ class AfkDataAPI {
     private final String MySQLDatabase = plugin.getConfig().getString("MySQLDatabase");
     private final String MySQLOption   = plugin.getConfig().getString("MySQLOption");
 
+    private Connection con = null;
+
     public AfkDataAPI() {
         if (isMySQL) {
-            Connection con = null;
             try {
                 con = DriverManager.getConnection("jdbc:mysql://" + MySQLServer + "/" + MySQLDatabase + MySQLOption, MySQLUsername, MySQLPassword);
                 if (!con.prepareStatement("SHOW TABLES LIKE 'AfkUserTable';").executeQuery().next()) {
@@ -39,14 +40,13 @@ class AfkDataAPI {
                             ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_ja_0900_as_cs_ks;").execute();
                     con.prepareStatement("ALTER TABLE `AfkUserTable` ADD PRIMARY KEY (`UUID`);").execute();
                 }
-                con.close();
             } catch (SQLException e) {
                 isMySQL = false;
-            } finally {
                 try {
                     con.close();
-                } catch (Exception e) {
-                    isMySQL = false;
+                    con = null;
+                } catch (Exception e2){
+                    con = null;
                 }
             }
         }
@@ -54,10 +54,8 @@ class AfkDataAPI {
 
     public List<AfkResult> getAllList(){
         List<AfkResult> list = new ArrayList<>();
-        if (isMySQL){
-            Connection con = null;
+        if (isMySQL && con != null){
             try {
-                con = DriverManager.getConnection("jdbc:mysql://" + MySQLServer + "/" + MySQLDatabase + MySQLOption, MySQLUsername, MySQLPassword);
                 ResultSet resultSet = con.prepareStatement("SELECT * FROM `AfkUserTable`;").executeQuery();
                 boolean isNext = resultSet.next();
                 while (isNext) {
@@ -68,14 +66,13 @@ class AfkDataAPI {
                     list.add(afk);
                     isNext = resultSet.next();
                 }
-                con.close();
             } catch (SQLException e) {
                 isMySQL = false;
-            } finally {
                 try {
                     con.close();
-                } catch (Exception e){
-
+                    con = null;
+                } catch (Exception e1){
+                    con = null;
                 }
             }
         } else {
@@ -86,10 +83,8 @@ class AfkDataAPI {
     }
 
     public AfkResult getUserResult(UUID uuid){
-        if (isMySQL){
-            Connection con = null;
+        if (isMySQL && con != null){
             try {
-                con = DriverManager.getConnection("jdbc:mysql://" + MySQLServer + "/" + MySQLDatabase + MySQLOption, MySQLUsername, MySQLPassword);
                 PreparedStatement statement = con.prepareStatement("SELECT * FROM `AfkUserTable` WHERE UUID = ?");
                 statement.setString(1, uuid.toString());
                 ResultSet set = statement.executeQuery();
@@ -98,21 +93,19 @@ class AfkDataAPI {
                     afk.setUuid(UUID.fromString(set.getString("UUID")));
                     afk.setAfkFlag(set.getBoolean("AfkFlag"));
                     afk.setDate(new Date(set.getTimestamp("LastMoveDate").getTime()));
-                    con.close();
                     return afk;
                 }
-                con.close();
                 return null;
             } catch (SQLException e) {
                 // e.printStackTrace();
                 isMySQL = false;
-                return null;
-            } finally {
                 try {
                     con.close();
-                } catch (Exception e){
-                    return null;
+                    con = null;
+                } catch (Exception e1){
+                    con = null;
                 }
+                return null;
             }
         } else {
             List<AfkResult> list = getAllList();
@@ -126,25 +119,22 @@ class AfkDataAPI {
     }
 
     public boolean addList(UUID uuid, boolean AfkFlag){
-        if (isMySQL){
-            Connection con = null;
+        if (isMySQL && con != null){
             try {
-                con = DriverManager.getConnection("jdbc:mysql://" + MySQLServer + "/" + MySQLDatabase + MySQLOption, MySQLUsername, MySQLPassword);
                 PreparedStatement statement = con.prepareStatement("INSERT INTO `AfkUserTable`(`UUID`, `AfkFlag`, `LastMoveDate`) VALUES (?,?,NOW())");
                 statement.setString(1, uuid.toString());
                 statement.setBoolean(2, AfkFlag);
                 boolean execute = statement.execute();
-                con.close();
                 return execute;
             } catch (SQLException e) {
                 // e.printStackTrace();
-                return false;
-            } finally {
                 try {
                     con.close();
-                } catch (Exception e){
-                    return false;
+                    con = null;
+                } catch (Exception e1){
+                    con = null;
                 }
+                return false;
             }
         } else {
             List<AfkResult> list = getAllList();
@@ -160,27 +150,23 @@ class AfkDataAPI {
     }
 
     public boolean updateList(UUID uuid, boolean AfkFlag){
-        if (isMySQL){
-            Connection con = null;
+        if (isMySQL && con != null){
             try {
-                con = DriverManager.getConnection("jdbc:mysql://" + MySQLServer + "/" + MySQLDatabase + MySQLOption, MySQLUsername, MySQLPassword);
                 PreparedStatement statement = con.prepareStatement("UPDATE `AfkUserTable` SET `UUID` = ?,`AfkFlag` = ?,`LastMoveDate` = NOW() WHERE UUID = ?");
                 statement.setString(1, uuid.toString());
                 statement.setBoolean(2, AfkFlag);
                 statement.setString(3, uuid.toString());
-                boolean execute = statement.execute();
-                con.close();
-                return execute;
+                return statement.execute();
             } catch (SQLException e) {
                 // e.printStackTrace();
                 isMySQL = false;
-                return false;
-            } finally {
                 try {
                     con.close();
-                } catch (Exception e){
-                    return false;
+                    con = null;
+                } catch (Exception e1){
+                    con = null;
                 }
+                return false;
             }
         } else {
 
@@ -197,25 +183,21 @@ class AfkDataAPI {
     }
 
     public boolean deleteListByUser(UUID uuid){
-        if (isMySQL){
-            Connection con = null;
+        if (isMySQL && con != null){
             try {
-                con = DriverManager.getConnection("jdbc:mysql://" + MySQLServer + "/" + MySQLDatabase + MySQLOption, MySQLUsername, MySQLPassword);
                 PreparedStatement statement = con.prepareStatement("DELETE FROM `AfkUserTable` WHERE UUID = ?");
                 statement.setString(1, uuid.toString());
-                boolean execute = statement.execute();
-                con.close();
-                return execute;
+                return statement.execute();
             } catch (SQLException e) {
                 // e.printStackTrace();
                 isMySQL = false;
-                return false;
-            } finally {
                 try {
                     con.close();
-                } catch (Exception e){
-                    return false;
+                    con = null;
+                } catch (Exception e1) {
+                    con = null;
                 }
+                return false;
             }
         } else {
             List<AfkResult> list = getAllList();
@@ -231,27 +213,34 @@ class AfkDataAPI {
     }
 
     public boolean deleteListByAll(){
-        if (isMySQL){
-            Connection con = null;
+        if (isMySQL && con != null){
             try {
-                con = DriverManager.getConnection("jdbc:mysql://" + MySQLServer + "/" + MySQLDatabase + MySQLOption, MySQLUsername, MySQLPassword);
-                boolean execute = con.prepareStatement("DELETE FROM `AfkUserTable` WHERE 1 = 1").execute();
-                con.close();
-                return execute;
+                return con.prepareStatement("DELETE FROM `AfkUserTable` WHERE 1 = 1").execute();
             } catch (SQLException e) {
                 // e.printStackTrace();
                 isMySQL = false;
-                return false;
-            } finally {
                 try {
                     con.close();
-                } catch (Exception e){
-                    return false;
+                    con = null;
+                } catch (Exception e1){
+                    con = null;
                 }
+                return false;
             }
         } else {
             List<AfkResult> list = new ArrayList<>();
             return fileWrite(pass, new GsonBuilder().setPrettyPrinting().create().toJson(list));
+        }
+    }
+
+    public void SQLConnectClose(){
+        try {
+            if (con != null){
+                con.close();
+                con = null;
+            }
+        } catch (SQLException throwable) {
+            con = null;
         }
     }
 
@@ -320,4 +309,5 @@ class AfkDataAPI {
             }
         }
     }
+
 }
