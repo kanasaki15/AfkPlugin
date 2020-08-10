@@ -8,12 +8,17 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitTask;
+
+import java.util.ArrayList;
+import java.util.List;
 
 class AfkEventListener implements Listener {
 
     private final AfkFunction afk = new AfkFunction();
     private final Plugin plugin = Bukkit.getPluginManager().getPlugin("AfkPlugin");
     private Player tpCommandExePlayer = null;
+    private List<TimerTask> taskList = new ArrayList<>();
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void PlayerCommandPreprocessEvent (PlayerCommandPreprocessEvent e){
@@ -59,10 +64,38 @@ class AfkEventListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void PlayerJoinEvent (PlayerJoinEvent e){
         new AfkFunction().SetInitAfkByUser(e.getPlayer().getUniqueId());
+        taskList.add(new TimerTask(e.getPlayer(), new AfkTimer(e.getPlayer()).runTaskLater(plugin, 20L)));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void Player (PlayerQuitEvent e){
+    public void PlayerQuitEvent (PlayerQuitEvent e){
+        int i = 0;
+        for (TimerTask task : taskList){
+            if (task.getPlayer().getUniqueId().equals(e.getPlayer().getUniqueId())){
+                task.cancel();
+                break;
+            }
+            i++;
+        }
+        taskList.remove(i);
         new AfkFunction().DeleteUser(e.getPlayer().getUniqueId());
+    }
+}
+
+class TimerTask{
+    private Player player;
+    private BukkitTask task;
+
+    TimerTask(Player player, BukkitTask task){
+        this.player = player;
+        this.task = task;
+    }
+
+    public void cancel(){
+        this.task.cancel();
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 }

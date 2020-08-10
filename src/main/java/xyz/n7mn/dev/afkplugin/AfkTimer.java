@@ -2,41 +2,60 @@ package xyz.n7mn.dev.afkplugin;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Date;
-import java.util.List;
+
 
 class AfkTimer extends BukkitRunnable {
     private final Plugin plugin = Bukkit.getPluginManager().getPlugin("AfkPlugin");
-    private final AfkFunction afk = new AfkFunction();
+    private final AfkFunction AfkAPI = new AfkFunction();
+
+    private boolean isCancel = false;
+
+    Player player;
+
+    public AfkTimer(Player player){
+        this.player = player;
+    }
 
     @Override
     public void run() {
 
-        plugin.reloadConfig();
-        int autoTime = plugin.getConfig().getInt("AfkAutoTime");
-        int min = autoTime / 60;
-        int sec = autoTime - (60 * min);
-        // System.out.println(autoTime);
+        if (!isCancel){
+            plugin.reloadConfig();
+            int autoTime = plugin.getConfig().getInt("AfkAutoTime");
+            int min = autoTime / 60;
+            int sec = autoTime - (60 * min);
+            // System.out.println(autoTime);
 
-        List<AfkResult> list = afk.GetAfkDataList();
 
-        for (int i = 0; i < list.size(); i++){
-            int nowTime = (int)(new Date().getTime() / 1000L);
-            int time = (int)(list.get(i).getDate().getTime() / 1000L);
-
-            if (list.get(i).isAfkFlag()){
-                continue;
+            AfkResult afk = AfkAPI.GetAfkDataByUser(player.getUniqueId());
+            if (afk != null && !afk.isAfkFlag()){
+                int nowTime = (int)(new Date().getTime() / 1000L);
+                int time = (int)(afk.getDate().getTime() / 1000L);
+                if (nowTime - time >= autoTime && time > 0){
+                    AfkAPI.SetAfk(afk.getUuid());
+                    Bukkit.getServer().getPlayer(afk.getUuid()).sendMessage(ChatColor.GREEN + AfkAPI.GetMessage("afkAutoOn").replaceAll("\\[min\\]",""+min).replaceAll("\\[sec\\]",""+sec));
+                }
             }
 
-            if (nowTime - time >= autoTime && time > 0){
-                afk.SetAfk(list.get(i).getUuid());
-                Bukkit.getServer().getPlayer(list.get(i).getUuid()).sendMessage(ChatColor.GREEN + afk.GetMessage("afkAutoOn").replaceAll("\\[min\\]",""+min).replaceAll("\\[sec\\]",""+sec));
-            }
+            new AfkTimer(player).runTaskLater(plugin, 20L);
         }
+    }
 
-        new AfkTimer().runTaskLater(plugin, 20);
+    @Override
+    public void cancel(){
+        isCancel = true;
+    }
+
+    public void setCancel(boolean cancel){
+        isCancel = cancel;
+    }
+
+    public boolean isCancel(){
+        return isCancel;
     }
 }

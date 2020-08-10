@@ -8,7 +8,6 @@ import org.bukkit.plugin.Plugin;
 
 import java.io.*;
 import java.sql.*;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -19,22 +18,20 @@ class AfkDataAPI {
     private final Plugin plugin = Bukkit.getPluginManager().getPlugin("AfkPlugin");
     private final String pass = "./" + plugin.getDataFolder().getPath() + "/AfkData.json";
 
-    private List<AfkResult> list;
     private boolean isMySQL = plugin.getConfig().getBoolean("UseMySQL");
 
     private final String MySQLServer   = plugin.getConfig().getString("MySQLServer");
     private final String MySQLUsername = plugin.getConfig().getString("MySQLUsername");
     private final String MySQLPassword = plugin.getConfig().getString("MySQLPassword");
     private final String MySQLDatabase = plugin.getConfig().getString("MySQLDatabase");
-    private final String MySQLOption = plugin.getConfig().getString("MySQLOption");
+    private final String MySQLOption   = plugin.getConfig().getString("MySQLOption");
 
-    public AfkDataAPI(){
-        if (isMySQL){
+    public AfkDataAPI() {
+        if (isMySQL) {
             Connection con = null;
-            list = new ArrayList<>();
             try {
-                con = DriverManager.getConnection("jdbc:mysql://" + MySQLServer + "/" + MySQLDatabase+MySQLOption, MySQLUsername, MySQLPassword);
-                if (!con.prepareStatement("SHOW TABLES LIKE 'AfkUserTable';").executeQuery().next()){
+                con = DriverManager.getConnection("jdbc:mysql://" + MySQLServer + "/" + MySQLDatabase + MySQLOption, MySQLUsername, MySQLPassword);
+                if (!con.prepareStatement("SHOW TABLES LIKE 'AfkUserTable';").executeQuery().next()) {
                     con.prepareStatement("CREATE TABLE `AfkUserTable` (\n" +
                             "  `UUID` varchar(36) COLLATE utf8mb4_ja_0900_as_cs_ks NOT NULL,\n" +
                             "  `AfkFlag` tinyint(1) NOT NULL,\n" +
@@ -42,35 +39,49 @@ class AfkDataAPI {
                             ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_ja_0900_as_cs_ks;").execute();
                     con.prepareStatement("ALTER TABLE `AfkUserTable` ADD PRIMARY KEY (`UUID`);").execute();
                 }
+                con.close();
+            } catch (SQLException e) {
+                isMySQL = false;
+            } finally {
+                try {
+                    con.close();
+                } catch (Exception e) {
+                    isMySQL = false;
+                }
+            }
+        }
+    }
 
+    public List<AfkResult> getAllList(){
+        List<AfkResult> list = new ArrayList<>();
+        if (isMySQL){
+            Connection con = null;
+            try {
+                con = DriverManager.getConnection("jdbc:mysql://" + MySQLServer + "/" + MySQLDatabase + MySQLOption, MySQLUsername, MySQLPassword);
                 ResultSet resultSet = con.prepareStatement("SELECT * FROM `AfkUserTable`;").executeQuery();
                 boolean isNext = resultSet.next();
-                if (isNext){
-                    while (isNext){
-                        AfkResult afk = new AfkResult();
-                        afk.setUuid(UUID.fromString(resultSet.getString("UUID")));
-                        afk.setAfkFlag(resultSet.getBoolean("AfkFlag"));
-                        afk.setDate(new Date(resultSet.getTimestamp("LastMoveDate").getTime()));
-                        list.add(afk);
-                        isNext = resultSet.next();
-                    }
+                while (isNext) {
+                    AfkResult afk = new AfkResult();
+                    afk.setUuid(UUID.fromString(resultSet.getString("UUID")));
+                    afk.setAfkFlag(resultSet.getBoolean("AfkFlag"));
+                    afk.setDate(new Date(resultSet.getTimestamp("LastMoveDate").getTime()));
+                    list.add(afk);
+                    isNext = resultSet.next();
                 }
+                con.close();
             } catch (SQLException e) {
                 isMySQL = false;
             } finally {
                 try {
                     con.close();
                 } catch (Exception e){
-                    isMySQL = false;
+
                 }
             }
         } else {
-
             list = new GsonBuilder().setPrettyPrinting().create().fromJson(fileRead(pass), new TypeToken<Collection<AfkResult>>(){}.getType());
         }
-    }
 
-    public List<AfkResult> getAllList(){
         return list;
     }
 
@@ -87,10 +98,10 @@ class AfkDataAPI {
                     afk.setUuid(UUID.fromString(set.getString("UUID")));
                     afk.setAfkFlag(set.getBoolean("AfkFlag"));
                     afk.setDate(new Date(set.getTimestamp("LastMoveDate").getTime()));
-
+                    con.close();
                     return afk;
                 }
-
+                con.close();
                 return null;
             } catch (SQLException e) {
                 // e.printStackTrace();
@@ -100,12 +111,11 @@ class AfkDataAPI {
                 try {
                     con.close();
                 } catch (Exception e){
-                    isMySQL = false;
                     return null;
                 }
             }
         } else {
-            list = getAllList();
+            List<AfkResult> list = getAllList();
             for (int i = 0; i < list.size(); i++){
                 if (list.get(i).getUuid().equals(uuid)){
                     return list.get(i);
@@ -123,21 +133,21 @@ class AfkDataAPI {
                 PreparedStatement statement = con.prepareStatement("INSERT INTO `AfkUserTable`(`UUID`, `AfkFlag`, `LastMoveDate`) VALUES (?,?,NOW())");
                 statement.setString(1, uuid.toString());
                 statement.setBoolean(2, AfkFlag);
-                return statement.execute();
+                boolean execute = statement.execute();
+                con.close();
+                return execute;
             } catch (SQLException e) {
                 // e.printStackTrace();
-                isMySQL = false;
                 return false;
             } finally {
                 try {
                     con.close();
                 } catch (Exception e){
-                    isMySQL = false;
                     return false;
                 }
             }
         } else {
-            list = getAllList();
+            List<AfkResult> list = getAllList();
 
             AfkResult afk = new AfkResult();
             afk.setUuid(uuid);
@@ -158,7 +168,9 @@ class AfkDataAPI {
                 statement.setString(1, uuid.toString());
                 statement.setBoolean(2, AfkFlag);
                 statement.setString(3, uuid.toString());
-                return statement.execute();
+                boolean execute = statement.execute();
+                con.close();
+                return execute;
             } catch (SQLException e) {
                 // e.printStackTrace();
                 isMySQL = false;
@@ -167,13 +179,12 @@ class AfkDataAPI {
                 try {
                     con.close();
                 } catch (Exception e){
-                    isMySQL = false;
                     return false;
                 }
             }
         } else {
 
-            list = getAllList();
+            List<AfkResult> list = getAllList();
             for (int i = 0; i < list.size(); i++){
                 if (list.get(i).getUuid().equals(uuid)){
                     list.get(i).setAfkFlag(AfkFlag);
@@ -192,7 +203,9 @@ class AfkDataAPI {
                 con = DriverManager.getConnection("jdbc:mysql://" + MySQLServer + "/" + MySQLDatabase + MySQLOption, MySQLUsername, MySQLPassword);
                 PreparedStatement statement = con.prepareStatement("DELETE FROM `AfkUserTable` WHERE UUID = ?");
                 statement.setString(1, uuid.toString());
-                return statement.execute();
+                boolean execute = statement.execute();
+                con.close();
+                return execute;
             } catch (SQLException e) {
                 // e.printStackTrace();
                 isMySQL = false;
@@ -201,12 +214,11 @@ class AfkDataAPI {
                 try {
                     con.close();
                 } catch (Exception e){
-                    isMySQL = false;
                     return false;
                 }
             }
         } else {
-            list = getAllList();
+            List<AfkResult> list = getAllList();
 
             for (int i = 0; i < list.size(); i++){
                 if (list.get(i).getUuid().equals(uuid)){
@@ -223,7 +235,9 @@ class AfkDataAPI {
             Connection con = null;
             try {
                 con = DriverManager.getConnection("jdbc:mysql://" + MySQLServer + "/" + MySQLDatabase + MySQLOption, MySQLUsername, MySQLPassword);
-                return con.prepareStatement("DELETE FROM `AfkUserTable` WHERE 1 = 1").execute();
+                boolean execute = con.prepareStatement("DELETE FROM `AfkUserTable` WHERE 1 = 1").execute();
+                con.close();
+                return execute;
             } catch (SQLException e) {
                 // e.printStackTrace();
                 isMySQL = false;
@@ -232,12 +246,11 @@ class AfkDataAPI {
                 try {
                     con.close();
                 } catch (Exception e){
-                    isMySQL = false;
                     return false;
                 }
             }
         } else {
-            list = new ArrayList<>();
+            List<AfkResult> list = new ArrayList<>();
             return fileWrite(pass, new GsonBuilder().setPrettyPrinting().create().toJson(list));
         }
     }
@@ -286,13 +299,12 @@ class AfkDataAPI {
     }
 
     private boolean fileWrite(String pass, String content){
+
         if (System.getProperty("os.name").toLowerCase().startsWith("windows")){
             pass = pass.replaceAll("/", "\\\\");
         }
-
         File file = new File(pass);
         PrintWriter p_writer = null;
-
         try{
             p_writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file),"UTF-8")));
             p_writer.print(content);

@@ -2,6 +2,7 @@ package xyz.n7mn.dev.afkplugin;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 import xyz.n7mn.dev.bstats.bukkit.Metrics;
 
 import java.io.File;
@@ -45,8 +46,6 @@ public final class AfkPlugin extends JavaPlugin {
             getLogger().info("LangFile NotFound!!");
         }
 
-        new AfkTimer().runTaskLater(this, 20);
-
         Metrics metrics = new Metrics(this, 8475);
         getLogger().info("AfkPlugin Ver " + Bukkit.getPluginManager().getPlugin("AfkPlugin").getDescription().getVersion() + " Started!");
     }
@@ -55,6 +54,7 @@ public final class AfkPlugin extends JavaPlugin {
     public void onDisable() {
         // Plugin shutdown logic
         // new AfkFunction().fileWrite("./" + getDataFolder().getPath() + "/AfkData.json","[]");
+
         new AfkFunction().DeleteAllUser();
         getLogger().info("AfkPlugin Ver " + Bukkit.getPluginManager().getPlugin("AfkPlugin").getDescription().getVersion() + " Stoped!!");
     }
