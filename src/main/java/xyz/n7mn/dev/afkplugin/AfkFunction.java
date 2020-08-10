@@ -66,7 +66,7 @@ public class AfkFunction {
     }
 
     public void SetInitAfkByUser(UUID uuid){
-        System.out.println(AfkAPI.addList(uuid, false));
+        AfkAPI.addList(uuid, false);
     }
 
     public boolean DeleteUser(UUID uuid){
