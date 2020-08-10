@@ -19,7 +19,7 @@ public class AfkFunction {
     }
 
     public AfkResult GetAfkDataByUser(UUID uuid){
-        return new AfkDataAPI().getUserResult(uuid);
+        return AfkAPI.getUserResult(uuid);
     }
 
     @Deprecated
@@ -66,7 +66,7 @@ public class AfkFunction {
     }
 
     public void SetInitAfkByUser(UUID uuid){
-        AfkAPI.addList(uuid, false);
+        System.out.println(AfkAPI.addList(uuid, false));
     }
 
     public boolean DeleteUser(UUID uuid){

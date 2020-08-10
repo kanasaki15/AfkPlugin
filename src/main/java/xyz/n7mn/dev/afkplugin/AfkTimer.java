@@ -34,7 +34,10 @@ class AfkTimer extends BukkitRunnable {
 
 
             AfkResult afk = AfkAPI.GetAfkDataByUser(player.getUniqueId());
-            if (afk != null && !afk.isAfkFlag()){
+
+            if (afk == null){
+                isCancel = true;
+            }else if (!afk.isAfkFlag()){
                 int nowTime = (int)(new Date().getTime() / 1000L);
                 int time = (int)(afk.getDate().getTime() / 1000L);
                 if (nowTime - time >= autoTime && time > 0){

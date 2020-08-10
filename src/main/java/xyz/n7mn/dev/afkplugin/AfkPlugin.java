@@ -8,11 +8,13 @@ import java.io.File;
 
 public final class AfkPlugin extends JavaPlugin {
 
-    private final AfkFunction afk = new AfkFunction();
+    private AfkFunction afk;
 
     @Override
     public void onEnable() {
         // Plugin startup logic
+        afk = new AfkFunction();
+
         saveDefaultConfig();
         getCommand("afk").setExecutor(new AfkCommand(afk));
         getServer().getPluginManager().registerEvents(new AfkEventListener(afk),this);
@@ -40,7 +42,7 @@ public final class AfkPlugin extends JavaPlugin {
                     "  \"afkAutoOn\": \"[min]分[sec]秒放置されているのを検知したため退席状態になりました。 \",\n" +
                     "  \"tpTarget\": \"[user]さんは現在退席中のため、テレポートをキャンセルしました。\"\n" +
                     "}";
-            new AfkFunction().fileWrite(defaultPass, json);
+            afk.fileWrite(defaultPass, json);
         }
 
         if (!new File(pass).exists()){

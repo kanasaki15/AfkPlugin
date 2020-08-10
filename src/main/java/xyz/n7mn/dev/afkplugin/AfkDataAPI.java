@@ -124,8 +124,7 @@ class AfkDataAPI {
                 PreparedStatement statement = con.prepareStatement("INSERT INTO `AfkUserTable`(`UUID`, `AfkFlag`, `LastMoveDate`) VALUES (?,?,NOW())");
                 statement.setString(1, uuid.toString());
                 statement.setBoolean(2, AfkFlag);
-                boolean execute = statement.execute();
-                return execute;
+                return statement.execute();
             } catch (SQLException e) {
                 // e.printStackTrace();
                 try {
