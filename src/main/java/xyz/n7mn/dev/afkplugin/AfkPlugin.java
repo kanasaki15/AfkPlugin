@@ -2,7 +2,7 @@ package xyz.n7mn.dev.afkplugin;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import xyz.n7mn.dev.bstats.bukkit.Metrics;
+import xyz.n7mn.dev.bstats.bukkit.afk.Metrics;
 
 import java.io.File;
 
