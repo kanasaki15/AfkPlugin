@@ -25,7 +25,7 @@ class AfkTimer extends BukkitRunnable {
     @Override
     public void run() {
 
-        long start = System.currentTimeMillis();
+        // long start = System.currentTimeMillis();
 
         if (!isCancel){
             plugin.reloadConfig();
@@ -50,11 +50,11 @@ class AfkTimer extends BukkitRunnable {
 
             new AfkTimer(player,AfkAPI).runTaskLater(plugin, 20L);
         }
-
+/*
         long end = System.currentTimeMillis();
         long ms = end - start;
 
-        System.out.println("Timer ExeTime : " + ((double)(ms / 1000L)) + " ms");
+        System.out.println("Timer ExeTime : " + ((double)(ms / 1000L)) + " ms"); */
     }
 
     @Override

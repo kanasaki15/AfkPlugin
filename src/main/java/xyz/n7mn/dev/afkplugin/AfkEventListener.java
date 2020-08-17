@@ -77,7 +77,7 @@ class AfkEventListener implements Listener {
 
     @EventHandler
     public void PlayerMoveEvent (PlayerMoveEvent e){
-
+/*
         long start = System.currentTimeMillis();
 
         long lastMoveTime = afk.GetAfkDataByUser(e.getPlayer().getUniqueId()).getDate().getTime();
@@ -89,12 +89,12 @@ class AfkEventListener implements Listener {
         int min = autoTime / 60;
         int sec = autoTime - (60 * min);
 
-        if (time > 0 && time >= autoTime && !afk.isAfk(e.getPlayer().getUniqueId())){
+        if (time >= autoTime && !afk.isAfk(e.getPlayer().getUniqueId())){
             afk.SetAfk(e.getPlayer().getUniqueId());
             e.getPlayer().sendMessage(ChatColor.GREEN + afk.GetMessage("afkAutoOn").replaceAll("\\[min\\]",""+min).replaceAll("\\[sec\\]",""+sec));
             e.setCancelled(true);
         }
-
+*/
         if (afk.isAfk(e.getPlayer().getUniqueId())){
             if (e.getFrom().getBlockX() != e.getTo().getBlockX() || e.getFrom().getBlockY() != e.getTo().getBlockY() || e.getFrom().getBlockZ() != e.getTo().getBlockZ()){
                 e.getPlayer().sendMessage(ChatColor.YELLOW + afk.GetMessage("afkMove"));
@@ -103,17 +103,17 @@ class AfkEventListener implements Listener {
         } else {
             afk.SetAfk(e.getPlayer().getUniqueId(), false);
         }
-
+/*
         long end = System.currentTimeMillis();
         long ms = end - start;
 
-        System.out.println("Event ExeTime : " + ((double)(ms / 1000L)) + " ms");
+        System.out.println("Event ExeTime : " + ((double)(ms / 1000L)) + " ms"); */
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void PlayerJoinEvent (PlayerJoinEvent e){
         afk.SetInitAfkByUser(e.getPlayer().getUniqueId());
-        // new AfkTimer(e.getPlayer(), afk).runTaskLater(plugin, 20L);
+        new AfkTimer(e.getPlayer(), afk).runTaskLater(plugin, 20L);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
