@@ -113,7 +113,7 @@ class AfkEventListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void PlayerJoinEvent (PlayerJoinEvent e){
         afk.SetInitAfkByUser(e.getPlayer().getUniqueId());
-        new AfkTimer(e.getPlayer(), afk).runTaskLater(plugin, 20L);
+        new AfkTimer(e.getPlayer(), afk).runTaskLaterAsynchronously(plugin, 20L);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

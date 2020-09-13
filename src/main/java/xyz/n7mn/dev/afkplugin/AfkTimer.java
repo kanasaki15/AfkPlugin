@@ -48,7 +48,7 @@ class AfkTimer extends BukkitRunnable {
                 }
             }
 
-            new AfkTimer(player,AfkAPI).runTaskLater(plugin, 20L);
+            new AfkTimer(player,AfkAPI).runTaskLaterAsynchronously(plugin, 20L);
         }
 /*
         long end = System.currentTimeMillis();

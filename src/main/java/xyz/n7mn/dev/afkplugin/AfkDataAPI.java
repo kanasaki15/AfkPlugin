@@ -233,13 +233,16 @@ class AfkDataAPI {
     }
 
     public void SQLConnectClose(){
-        try {
-            if (con != null){
-                con.close();
-                con = null;
-            }
-        } catch (SQLException throwable) {
-            con = null;
+        if (con != null){
+            new Thread(
+                    ()->{
+                        try {
+                            con.close();
+                            con = null;
+                        } catch (Exception e){
+                            con = null;
+                        }
+                    }).start();
         }
     }
 
